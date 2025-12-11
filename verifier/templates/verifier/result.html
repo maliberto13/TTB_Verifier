@@ -1,0 +1,223 @@
+{% comment %}
+Expected context variables (common names used in earlier templates):
+- overall_pass: boolean (True if overall verification passed)
+- results: dict keyed by field name. Each value can be:
+    - a dict containing keys like 'status', 'found', 'score', 'value', etc.
+      where 'status' is typically one of MATCH, MISMATCH, NOT_FOUND, NOT_PROVIDED, INVALID
+    - OR a boolean (True means match)
+- ocr_text: string of OCR-extracted text (may be empty)
+- form: dict-like with submitted form values (brand_name, class_type, abv, net_contents, etc.)
+- run: Verification model instance (optional) with run.image.url
+You can adapt variable names if your view uses different names.
+{% endcomment %}
+
+{% load verifier_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Label Verification Result</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .match { color: #0f5132; background:#d1e7dd; padding:6px 10px; border-radius:6px; }
+    .mismatch { color: #842029; background:#f8d7da; padding:6px 10px; border-radius:6px; }
+    .warn { color:#664d03; background:#fff3cd; padding:6px 10px; border-radius:6px; }
+    .field-row { padding:10px; border-bottom:1px solid #eee; }
+    pre.ocr { white-space: pre-wrap; background:#f6f8fa; padding:12px; border-radius:6px; }
+    .thumb { max-width:360px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+    .lead-sml { font-size:0.95rem; color:#6c757d; }
+  </style>
+</head>
+<body class="bg-light">
+  <nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'verifier:base' %}">Label Verifier</a>
+    </div>
+  </nav>
+
+  <main class="container mb-5">
+    <div class="row">
+
+      <div class="col-lg-8">
+
+        <!-- Overall result header -->
+        <div class="card mb-3 p-3">
+          {% if not ocr_text %}
+            <div class="warn">
+              <strong>⚠ Could not read text from the label image.</strong>
+              <div class="lead-sml mt-1">
+                Please try a clearer photo or a higher-resolution scan of the label and upload again.
+              </div>
+            </div>
+          {% else %}
+            {% if overall_pass %}
+              <div class="match">
+                <strong>✅ The label matches the form data.</strong>
+                <div class="lead-sml mt-1">All required information is consistent.</div>
+              </div>
+            {% else %}
+              <div class="mismatch">
+                <strong>❌ The label does not match the form.</strong>
+                <div class="lead-sml mt-1">One or more required fields differ, or required text is missing.</div>
+              </div>
+            {% endif %}
+          {% endif %}
+        </div>
+
+        <!-- Discrepancy details -->
+        <div class="card mb-3 p-3">
+          <h5>Verification details</h5>
+          <p class="text-muted">Below are the specific checks the system performed. Any mismatches or missing information are listed clearly so you can address them.</p>
+
+          {% comment %} Helper macro-like logic: decide how to interpret each `info` element {% endcomment %}
+          {% for field, info in results.items %}
+            <div class="field-row row align-items-start">
+              <div class="col-md-4">
+                <strong>{{ field|capfirst}}</strong>
+                <div class="text-muted small mt-1">
+                  Form:
+                    <em>
+{#                        {{% if field.id == 'govt_warning' %}}#}
+{#                            True#}
+{#                        {{% else %}}#}
+                            {{ form|get_item:field }}
+                    </em>
+                </div>
+              </div>
+
+              <div class="col-md-8">
+                {% if info.type is bool %}
+                  {% if info %}
+                    <div class="match">MATCH</div>
+                    <div class="small mt-1">Matched according to the verification logic.</div>
+                  {% else %}
+                    <div class="mismatch">MISMATCH</div>
+                    <div class="small mt-1">The label did not match the form input for this field.</div>
+                  {% endif %}
+                {% else %}
+                  {# assume info is a dict with a 'status' key #}
+                  {% with status=info.status|default:"UNKNOWN" %}
+                    {% if status == "MATCH" or status == "FOUND" %}
+                      <div class="match">MATCH</div>
+                      <div class="small mt-1">
+                        {% if info.found %}Label shows: <strong>{{ info.found }}</strong>. {% endif %}
+                        {% if info.score %}Similarity: {{ info.score|floatformat:2 }}{% endif %}
+                      </div>
+
+                    {% elif status == "MISMATCH" %}
+                      <div class="mismatch">MISMATCH</div>
+                      <div class="small mt-1">
+                        {% if info.found %}
+                          Label: <strong>{{ info.found }}</strong> — Form: <strong>{{ field }}</strong>.
+                        {% else %}
+                          Form value differed from label content.
+                        {% endif %}
+                        {% if info.difference is not None %}
+                          <br>Difference: {{ info.difference }}.
+                        {% endif %}
+                        {% if info.score %}<br>Similarity: {{ info.score|floatformat:2 }}{% endif %}
+                      </div>
+
+                    {% elif status == "NOT_FOUND" %}
+                      <div class="mismatch">NOT FOUND</div>
+                      <div class="small mt-1">The label did not contain this field or it could not be located.</div>
+
+                    {% elif status == "NOT_PROVIDED" %}
+                      <div class="warn">NOT PROVIDED</div>
+                      <div class="small mt-1">You did not provide a value for this field on the form.</div>
+
+                    {% elif status == "INVALID" %}
+                      <div class="warn">INVALID FORM INPUT</div>
+                      <div class="small mt-1">The form input couldn't be parsed for comparison (e.g. malformed ABV).</div>
+
+                    {% else %}
+                      <div class="small">Status: {{ status }}</div>
+                      <div class="small mt-1">{{ info }}</div>
+                    {% endif %}
+                  {% endwith %}
+                {% endif %}
+              </div>
+            </div>
+          {% empty %}
+            <div class="p-3 text-muted">No field results are available.</div>
+          {% endfor %}
+        </div>
+
+        <!-- OCR text & guidance -->
+        <div class="card mb-3 p-3">
+          <h5>OCR-extracted text</h5>
+          {% if ocr_text %}
+            <pre class="ocr">{{ ocr_text }}</pre>
+            <div class="mt-2 text-muted small">If the extracted text looks wrong (garbled or missing lines), try a clearer image or crop to the label area.</div>
+          {% else %}
+            <div class="warn">No readable text was extracted from the image.</div>
+          {% endif %}
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex gap-2">
+          <a href="{% url 'verifier:base' %}" class="btn btn-outline-primary">Verify another label</a>
+          <a href="{% url 'admin:index' %}" class="btn btn-outline-secondary">View saved verifications (admin)</a>
+        </div>
+
+      </div>
+
+      <div class="col-lg-4">
+        <!-- Uploaded image preview -->
+        <div class="card p-3 mb-3 text-center">
+          <h6>Uploaded image</h6>
+          {% if form.image.name %}
+            <img src= "/media/{{ image }}" alt="Uploaded label image" class="thumb mt-2">
+          {% else %}
+            <div class="text-muted small mt-2">Image not available.</div>
+          {% endif %}
+        </div>
+
+        <!-- Summary of mismatches for quick copy/paste -->
+        <div class="card p-3 mb-3">
+          <h6>Quick report</h6>
+          {% if overall_pass %}
+            <div class="match">All required checks passed.</div>
+          {% else %}
+            <div class="mismatch mb-2">Discrepancies found:</div>
+            <ul>
+              {% for field, info in results.items %}
+                {% if info.type is bool %}
+                  {% if not info %}
+                    <li><strong>Value found in image ({{ ocr_values|get_item:field }})</strong> does not match form value ({{ form|get_item:field }}).</li>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <!-- Helpful tips -->
+        <div class="card p-3">
+          <h6>Tips to improve OCR</h6>
+          <ul class="small text-muted">
+            <li>Use a high-resolution, well-lit photo taken straight-on (avoid angle/skew).</li>
+            <li>Crop the image to show only the label (no background clutter).</li>
+            <li>Avoid reflections or glare; try matte lighting.</li>
+            <li>If a field isn't found, try entering an abbreviated brand or alternate spelling.</li>
+          </ul>
+        </div>
+
+          <!-- Next steps -->
+        <div class="card p-3">
+          <h6>What Next</h6>
+          <ul class="small text-muted">
+            <li>To quickly redo this form, hit the Back Button in your browser.</li>
+            <li>To fill out a new form, press the button at the bottom of the screen.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="text-center text-muted py-4">
+    <small>Label Verifier — OCR via Tesseract. This tool is a helper and not an official TTB approval system.</small>
+  </footer>
+</body>
+</html>

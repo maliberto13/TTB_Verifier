@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Label Verifier</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'verifier:base' %}">Label Verifier</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="card shadow p-4">
+
+        <h2 class="mb-3">Alcohol Label Verification</h2>
+        <p class="text-muted">
+            Enter the product details required for TTB-style verification, and upload the label image.
+        </p>
+
+        <form enctype="multipart/form-data" action="{% url 'verifier:upload' %}"  method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <!-- Brand Name -->
+            <div class="mb-3">
+                <label class="form-label"><strong>Brand Name</strong></label>
+                <input type="text" name="brand_name" class="form-control"
+                       placeholder="Old Tom Distillery" required>
+            </div>
+
+            <!-- Product Class/Type -->
+            <div class="mb-3">
+                <label class="form-label"><strong>Product Class/Type</strong></label>
+                <input type="text" name="class_type" class="form-control"
+                       placeholder="Kentucky Straight Bourbon Whiskey" required>
+            </div>
+
+            <!-- Alcohol Content -->
+            <div class="mb-3">
+                <label class="form-label"><strong>Alcohol Content (ABV %)</strong></label>
+                <input type="text" name="abv" class="form-control"
+                       placeholder="45%" required>
+            </div>
+
+            <!-- Net Contents -->
+            <div class="mb-3">
+                <label class="form-label"><strong>Net Contents</strong></label>
+                <input type="text" name="net_contents" class="form-control"
+                       placeholder="750 mL">
+                <small class="text-muted">Optional</small>
+            </div>
+
+            <!-- Image Upload -->
+            <div class="mb-3">
+                <label class="form-label"><strong>Upload Label Image</strong></label>
+                <input type="file" name="image" class="form-control"
+                       accept="image/png, image/jpeg, image/jpg" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                Verify Label
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>
