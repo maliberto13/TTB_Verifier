@@ -1,34 +1,36 @@
 
 import re
 from difflib import SequenceMatcher
+from fuzzywuzzy import process, fuzz
+from nltk import ngrams
 
 def normalize(s):
     return re.sub(r'[^a-z0-9% .-]', '', s.lower())
 
 def fuzzy(a,b):
-    return SequenceMatcher(None, normalize(a), normalize(b)).ratio()
+    return process.extractOne(a,b,scorer=fuzz.ratio,)
 
-def compare_text(expected, ocr, threshold=0.7):
-    best = 0
+def compare_text(expected, ocr, threshold=90):
+    best = ''
+    len_expected = len(expected.split())
+    ngrams_list = list(ngrams(ocr.split(), len_expected))
+    best_match = process.extractOne(expected,ngrams_list    , scorer=fuzz.token_sort_ratio)
+    return best_match[1]  >= threshold
 
-    for part in ocr.split():
-        sc = fuzzy(expected, part)
-        best = max(best, sc)
-        print(part, sc, best)
-    return best >= threshold
-
-def extract_text(expected, ocr, threshold=0.7):
-    best = 0
-    best_part = ''
-    for part in ocr.split():
-        sc = fuzzy(expected, part)
-        if sc > best:
-            best = max(best, sc)
-            best_part = part
-    return best_part
+def extract_text(expected, ocr, threshold=90):
+    best = ''
+    len_expected = len(expected.split())
+    ngrams_list = list(ngrams(ocr.split(), len_expected))
+    print(expected)
+    print('ngrams', ngrams_list)
+    best_match = process.extractOne(expected, ngrams_list, scorer=fuzz.token_sort_ratio)
+    print(best_match)
+    return ' '.join(best_match[0])
 
 def extract_abv(ocr):
     abv = re.findall(r'(\d+(?:\.\d+)?)%', ocr)
+    if not abv:
+        return ''
     return abv
 
 def compare_abv(expected, ocr):

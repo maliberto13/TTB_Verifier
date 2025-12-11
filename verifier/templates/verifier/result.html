@@ -96,7 +96,10 @@ You can adapt variable names if your view uses different names.
 
               <div class="col-md-8">
                 {% if info.type is bool %}
-                  {% if info %}
+                  {% if form|get_item:field == '' %}
+                      <div class="warn">NOT PROVIDED</div>
+                      <div class="small mt-1">You did not provide a value for this field on the form.</div>
+                  {% elif info %}
                     <div class="match">MATCH</div>
                     <div class="small mt-1">Matched according to the verification logic.</div>
                   {% else %}
@@ -131,7 +134,7 @@ You can adapt variable names if your view uses different names.
                       <div class="mismatch">NOT FOUND</div>
                       <div class="small mt-1">The label did not contain this field or it could not be located.</div>
 
-                    {% elif status == "NOT_PROVIDED" %}
+                    {% elif form|get_item:field == '' %}
                       <div class="warn">NOT PROVIDED</div>
                       <div class="small mt-1">You did not provide a value for this field on the form.</div>
 
@@ -166,7 +169,6 @@ You can adapt variable names if your view uses different names.
         <!-- Actions -->
         <div class="d-flex gap-2">
           <a href="{% url 'verifier:base' %}" class="btn btn-outline-primary">Verify another label</a>
-          <a href="{% url 'admin:index' %}" class="btn btn-outline-secondary">View saved verifications (admin)</a>
         </div>
 
       </div>
@@ -193,7 +195,7 @@ You can adapt variable names if your view uses different names.
               {% for field, info in results.items %}
                 {% if info.type is bool %}
                   {% if not info %}
-                    <li><strong>Value found in image ({{ ocr_values|get_item:field }})</strong> does not match form value ({{ form|get_item:field }}).</li>
+                    <li><strong>{{ field|replace:'_ '|title}} found in image ({{ ocr_values|get_item:field }})</strong> does not match form value ({{ form|get_item:field }}).</li>
                   {% endif %}
                 {% endif %}
               {% endfor %}

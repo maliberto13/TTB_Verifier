@@ -25,15 +25,16 @@ def upload(request):
                 'brand_name': extract_text(form.cleaned_data['brand_name'], ocr),
                 'class_type': extract_text(form.cleaned_data['class_type'], ocr),
                 'abv': extract_abv(ocr),
-                'net_contents': extract_text(form.cleaned_data['class_type'], ocr),
+                'net_contents': extract_text(form.cleaned_data['net_contents'], ocr),
                 'govt_warning': extract_text('government warning', ocr.lower())
             }
+
             results = {
-                'brand_name': compare_text(form.cleaned_data['brand_name'], ocr),
-                'class_type': form.cleaned_data['class_type'].lower() in ocr.lower(),
-                'abv': compare_abv(form.cleaned_data['abv'], ocr),
-                'net_contents': compare_text(form.cleaned_data.get('net_contents',''), ocr),
-                'govt_warning': ('government warning' in ocr.lower()) if form.cleaned_data.get('govt_warning') else True
+                'brand_name': compare_text(form.cleaned_data['brand_name'].lower(), ocr.lower()),
+                'class_type': compare_text(form.cleaned_data['class_type'].lower(), ocr.lower()),
+                'abv': compare_abv(form.cleaned_data['abv'].lower(), ocr),
+                'net_contents': compare_text(form.cleaned_data.get('net_contents','').lower(), ocr.lower()),
+                'govt_warning': 'government warning' in ocr.lower()
             }
 
             passed = all(results.values())
