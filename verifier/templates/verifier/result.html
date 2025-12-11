@@ -74,14 +74,22 @@ You can adapt variable names if your view uses different names.
           {% for field, info in results.items %}
             <div class="field-row row align-items-start">
               <div class="col-md-4">
-                <strong>{{ field|capfirst}}</strong>
+                  {% if field == "abv" %}
+                    <strong>Alcohol By Volume</strong>
+                  {% elif field == "govt_warning" %}
+                    <strong>Government Warning</strong>
+                  {% else %}
+                    <strong>{{ field|replace:'_ '|title}}</strong>
+                  {% endif %}
+
                 <div class="text-muted small mt-1">
                   Form:
                     <em>
-{#                        {{% if field.id == 'govt_warning' %}}#}
-{#                            True#}
-{#                        {{% else %}}#}
+                        {% if field == "govt_warning" %}
+                            True
+                        {% else %}
                             {{ form|get_item:field }}
+                        {% endif %}
                     </em>
                 </div>
               </div>
