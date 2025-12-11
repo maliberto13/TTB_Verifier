@@ -7,7 +7,6 @@ from .compare_utils import compare_text, compare_abv, extract_text, extract_abv
 from .models import Verification
 from django.http import HttpResponse
 
-logger = logging.getLogger('verifier')
 def base(request):
     return render(request, "verifier/base.html")
 
@@ -21,6 +20,7 @@ def upload(request):
             img = form.cleaned_data['image']
             ocr = extract_text_from_image(img)
 
+            # Best values found by ocr.
             ocr_values = {
                 'brand_name': extract_text(form.cleaned_data['brand_name'], ocr),
                 'class_type': extract_text(form.cleaned_data['class_type'], ocr),
@@ -29,6 +29,7 @@ def upload(request):
                 'govt_warning': extract_text('government warning', ocr.lower())
             }
 
+            # Dict of booleans for each field. True if these is a match, otherwise false.
             results = {
                 'brand_name': compare_text(form.cleaned_data['brand_name'].lower(), ocr.lower()),
                 'class_type': compare_text(form.cleaned_data['class_type'].lower(), ocr.lower()),
@@ -39,14 +40,6 @@ def upload(request):
 
             passed = all(results.values())
 
-            # run = Verification.objects.create(
-            #     # form_data=form.cleaned_data,
-            # #     extracted_text=ocr,
-            # #     result_summary=results,
-            #     image=img
-            # #     passed=passed
-            # )
-
             return render(request, "verifier/result.html", {
                 "ocr_text": ocr,
                 "results": results,
@@ -54,12 +47,9 @@ def upload(request):
                 "form": form.cleaned_data,
                 "ocr_values": ocr_values,
                 'image': img
-                # "run": run,
             })
     else:
         form = LabelForm()
 
     return render(request, "verifier/result.html", {"form": form})
 
-def result(request):
-    return render(request, "verifier/result.html")

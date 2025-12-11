@@ -95,7 +95,7 @@ You can adapt variable names if your view uses different names.
               </div>
 
               <div class="col-md-8">
-                {% if info.type is bool %}
+                {% if info|is_boolean %}
                   {% if form|get_item:field == '' %}
                       <div class="warn">NOT PROVIDED</div>
                       <div class="small mt-1">You did not provide a value for this field on the form.</div>
@@ -193,10 +193,14 @@ You can adapt variable names if your view uses different names.
             <div class="mismatch mb-2">Discrepancies found:</div>
             <ul>
               {% for field, info in results.items %}
-                {% if info.type is bool %}
+                {% if info|is_boolean%}
                   {% if not info %}
+                    {% if field != "govt_warning" %}
                     <li><strong>{{ field|replace:'_ '|title}} found in image ({{ ocr_values|get_item:field }})</strong> does not match form value ({{ form|get_item:field }}).</li>
-                  {% endif %}
+                    {% else %}
+                    <li><strong>Government Warning was not found in image.</li>
+                {% endif %}
+                {% endif %}
                 {% endif %}
               {% endfor %}
             </ul>
@@ -219,7 +223,7 @@ You can adapt variable names if your view uses different names.
           <h6>What Next</h6>
           <ul class="small text-muted">
             <li>To quickly redo this form, hit the Back Button in your browser.</li>
-            <li>To fill out a new form, press the button at the bottom of the screen.</li>
+            <li>To fill out a new form, press Verify Another Label.</li>
           </ul>
         </div>
       </div>

@@ -1,3 +1,5 @@
+# Python file that allows for custom filters within HTML.
+
 from django import template
 
 register = template.Library()
@@ -12,3 +14,7 @@ def get_item(dict, key):
 @register.filter
 def replace(item, chars):
     return item.replace(chars[0], chars[1])
+
+@register.filter
+def is_boolean(value):
+    return isinstance(value, bool)

@@ -4,27 +4,24 @@ from difflib import SequenceMatcher
 from fuzzywuzzy import process, fuzz
 from nltk import ngrams
 
-def normalize(s):
-    return re.sub(r'[^a-z0-9% .-]', '', s.lower())
+# Returns if best match matches above specified ratio.
+def compare_text(expected, ocr, threshold=98):
+    if expected == '' or ocr == '':
+        return False
 
-def fuzzy(a,b):
-    return process.extractOne(a,b,scorer=fuzz.ratio,)
-
-def compare_text(expected, ocr, threshold=90):
-    best = ''
     len_expected = len(expected.split())
     ngrams_list = list(ngrams(ocr.split(), len_expected))
     best_match = process.extractOne(expected,ngrams_list    , scorer=fuzz.token_sort_ratio)
     return best_match[1]  >= threshold
 
-def extract_text(expected, ocr, threshold=90):
-    best = ''
+# Returns best match in ocr to expected string.
+def extract_text(expected, ocr, threshold=98):
+    if expected == '' or ocr == '':
+        return ''
+
     len_expected = len(expected.split())
     ngrams_list = list(ngrams(ocr.split(), len_expected))
-    print(expected)
-    print('ngrams', ngrams_list)
     best_match = process.extractOne(expected, ngrams_list, scorer=fuzz.token_sort_ratio)
-    print(best_match)
     return ' '.join(best_match[0])
 
 def extract_abv(ocr):
