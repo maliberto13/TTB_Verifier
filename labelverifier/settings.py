@@ -6,7 +6,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'replace-this-with-secure-key'
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['ttb-verifier.fly.dev', '127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ["https://ttb-verifier.fly.dev"]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -30,25 +31,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'labelverifier.urls'
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'debug.log',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    },
-}
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -66,16 +48,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'labelverifier.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-        'USER':'root',
-        'PASSWORD':'root',
-        'HOST':'localhost',
-        'PORT':'8000',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': '/data/db.sqlite3',
+#         # 'USER':'root',
+#         # 'PASSWORD':'root',
+#         # 'HOST':'localhost',
+#         # 'PORT':'8000',
+#     }
+# }
+
+DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "data" / "db.sqlite3"}}
+
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
