@@ -81,6 +81,7 @@ This repository contains a Django-based web application designed to verify text 
 ## Project Structure
 
 ```
+├── data/                 # Houses the database for the forms to be posted to.
 ├── labelverifier/        # Django project settings and configuration
 ├── verifier/             # Main Django application for verification logic
 │   ├── compare_utils.py  # Fuzzy matching and comparison functions
@@ -93,6 +94,8 @@ This repository contains a Django-based web application designed to verify text 
 │   │       ├── base.html
 │   │       ├── result.html
 │   │       └── upload_form.html
+│   │   ├── templatetags/
+│   │       ├── verifier_extras.py # HTML filters for Pythonic expressions
 │   └── urls.py           # URL routing for the verifier app
 ├── manage.py             # Django's command-line utility
 └── requirements.txt      # Python dependencies
