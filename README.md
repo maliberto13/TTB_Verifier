@@ -80,8 +80,8 @@ This repository contains a Django-based web application designed to verify text 
 
 ## Design Process
 
-1.  Prompted **ChatGPT** to using the project guidelines document for codebase.
-2.  Discovered countless bugs to fix functionality
+1.  Prompted **ChatGPT** using the project guidelines document for codebase.
+2.  Searched for countless bugs to fix functionality of generated codebase.
 3.  Prompted ChatGPT for optimal place to deploy Django webapp with PyTesseract.
 4.  Continued to debug and deploy until application worked on **Fly.IO**
 
