@@ -78,6 +78,19 @@ This repository contains a Django-based web application designed to verify text 
 6.  To quickly go back to the previous form, use the Back Button in your browser.
 7.  To start a new form, use the "Verify Another Label" button.
 
+## Design Process
+
+1.  Prompted **ChatGPT** to using the project guidelines document for codebase.
+2.  Discovered countless bugs to fix functionality
+3.  Prompted ChatGPT for optimal place to deploy Django webapp with PyTesseract.
+4.  Continued to debug and deploy until application worked on **Fly.IO**
+
+## Design Considerations
+1.  PyTesseract OCR - I am most familiar with Python, so used this recommended OCR
+2.  Django Web App - since it was recommended to use PyTesseract, I thought it would be easiest to keep everything within the Python ecosystem.
+3.  Fuzzywuzzy - started to use for inexact matching, but decided to assume exact matches were desired
+4.  nltk - used to create ngrams, enabling comparison between similar length phrases from OCR output
+
 ## Project Structure
 
 ```
@@ -99,3 +112,5 @@ This repository contains a Django-based web application designed to verify text 
 │   └── urls.py           # URL routing for the verifier app
 ├── manage.py             # Django's command-line utility
 └── requirements.txt      # Python dependencies
+
+
