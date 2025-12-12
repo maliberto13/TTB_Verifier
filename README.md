@@ -37,7 +37,7 @@ This repository contains a Django-based web application designed to verify text 
     *   **Ubuntu/Debian:** `sudo apt-get install tesseract-ocr`
     *   **Windows:** Download and run the installer from the [Tesseract at UB Mannheim](https://github.com/UB-Mannheim/tesseract/wiki) page.
 
-### Installation
+### Installation on MacOS
 
 1.  **Clone the repository:**
     ```bash
@@ -48,7 +48,7 @@ This repository contains a Django-based web application designed to verify text 
 2.  **Create and activate a virtual environment (recommended):**
     ```bash
     python -m venv venv
-    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+    source venv/bin/activate  
     ```
 
 3.  **Install the required Python packages:**
@@ -71,10 +71,12 @@ This repository contains a Django-based web application designed to verify text 
 ## Usage
 
 1.  Navigate to the application's home page.
-2.  Fill in the form fields with the data you expect to find on the label. The `Brand Name`, `Product Class/Type`, and `Alcohol Content` fields are required.
+2.  Fill in the form fields with the _exact_ data you expect to find on the label.
 3.  Click "Choose File" to select and upload a clear image of the label.
 4.  Press the "Verify Label" button.
 5.  The next page will display the verification results, including an overall pass/fail status and a detailed breakdown for each field. Tips for improving accuracy and a quick report of discrepancies are also provided.
+6.  To quickly go back to the previous form, use the Back Button in your browser.
+7.  To start a new form, use the "Verify Another Label" button.
 
 ## Project Structure
 
