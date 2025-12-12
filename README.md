@@ -1,11 +1,11 @@
 # TTB Label Verifier
-[![Ask DeepWiki](https://devin.ai/assets/askdeepwiki.png)](https://deepwiki.com/maliberto13/TTB_Verifier)
+Link: (ttb-verifier.fly.dev)
 
 This repository contains a Django-based web application designed to verify text on alcohol labels against user-provided data. The system uses Optical Character Recognition (OCR) to extract text from an uploaded label image and compares it to the submitted form data, providing a detailed breakdown of matches and mismatches. It is styled after the requirements for TTB (Alcohol and Tobacco Tax and Trade Bureau) label verification.
 
 ## Key Features
 
-*   **Web-Based Interface:** A simple web form to input label data and upload an image.
+*   **Web-Based Interface:** A simple web form to input label data and upload an image. (ttb-verifier.fly.dev)
 *   **OCR Text Extraction:** Uses `Pytesseract` to read and extract text from the label image.
 *   **Intelligent Text Comparison:** Employs `fuzzywuzzy` and `nltk` for fuzzy string matching to robustly compare the expected text with the OCR output, accounting for minor OCR errors.
 *   **Field-Specific Verification:** Performs individual checks for:
