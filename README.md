@@ -28,7 +28,53 @@ This repository contains a Django-based web application designed to verify text 
 
 ## Getting Started
 
-Navigate to (ttb-verifier.fly.dev).
+### Prerequisites
+
+*   Python 3.x
+*   pip
+*   **Tesseract OCR Engine:** This is a system dependency, not a Python package. You must install it on your operating system and ensure the `tesseract` command is available in your system's PATH.
+    *   **macOS (via Homebrew):** `brew install tesseract`
+    *   **Ubuntu/Debian:** `sudo apt-get install tesseract-ocr`
+    *   **Windows:** Download and run the installer from the [Tesseract at UB Mannheim](https://github.com/UB-Mannheim/tesseract/wiki) page.
+
+### Installation
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/maliberto13/ttb_verifier.git
+    cd ttb_verifier
+    ```
+
+2.  **Create and activate a virtual environment (recommended):**
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+    ```
+
+3.  **Install the required Python packages:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4.  **Apply database migrations:**
+    ```bash
+    python manage.py migrate
+    ```
+
+5.  **Run the development server:**
+    ```bash
+    python manage.py runserver
+    ```
+
+6.  Open your web browser and navigate to `http://127.0.0.1:8000/` to use the application.
+
+## Usage
+
+1.  Navigate to the application's home page.
+2.  Fill in the form fields with the data you expect to find on the label. The `Brand Name`, `Product Class/Type`, and `Alcohol Content` fields are required.
+3.  Click "Choose File" to select and upload a clear image of the label.
+4.  Press the "Verify Label" button.
+5.  The next page will display the verification results, including an overall pass/fail status and a detailed breakdown for each field. Tips for improving accuracy and a quick report of discrepancies are also provided.
 
 ## Project Structure
 
